@@ -94,6 +94,7 @@ public class MovieFragment extends Fragment {
         binding.svMovie.getViewTreeObserver().addOnScrollChangedListener(() -> {
             if (binding.svMovie.getChildAt(0).getBottom() <= (binding.svMovie.getHeight() + binding.svMovie.getScrollY())) {
                 if (currentPage < totalPage) {
+                    System.out.println("Load More");
                     currentPage++;
                     getPopularMovies(currentPage);
                 }
