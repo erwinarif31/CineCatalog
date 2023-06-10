@@ -32,9 +32,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:foreground="@drawable/ripple_effect"
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/iv_movie"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:scaleType="centerCrop"
@@ -55,9 +57,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:foreground="@drawable/ripple_effect"
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/iv_tv_show"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:scaleType="centerCrop"
@@ -78,9 +82,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:foreground="@drawable/ripple_effect"
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/iv_favorite"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:scaleType="centerCrop"
