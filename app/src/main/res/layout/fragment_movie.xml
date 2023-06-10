@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Now Playing"
+                    android:text="Now Playing Movies"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +44,7 @@
                     app:layout_constraintTop_toBottomOf="@id/tv_now_playing">
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_movie_now_playing"
+                        android:id="@+id/rv_now_playing"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
 
@@ -94,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Upcoming"
+                    android:text="Upcoming Movies"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -151,7 +151,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Top Rated"
+                    android:text="Top Rated Movies"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -213,18 +213,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Popular"
+                    android:text="Popular Movies"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <androidx.core.widget.NestedScrollView
-                    android:id="@+id/sv_movie_popular"
+                    android:id="@+id/sv_popular"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_movie_popular"
+                        android:id="@+id/rv_popular"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
 

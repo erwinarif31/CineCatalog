@@ -47,7 +47,11 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentV
         }
 
         public void onBind(ContentItem contentItem) {
-            binding.ivTitle.setText(contentItem.getOriginalTitle());
+            if (contentItem.getTitle() != null) {
+                binding.ivTitle.setText(contentItem.getTitle());
+            } else {
+                binding.ivTitle.setText(contentItem.getName());
+            }
             Glide.with(binding.getRoot()).load(ApiInstance.IMAGE_BASE_URL + contentItem.getPosterPath()).into(binding.ivPoster);
         }
     }

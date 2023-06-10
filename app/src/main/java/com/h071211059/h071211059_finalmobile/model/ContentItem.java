@@ -20,6 +20,12 @@ public class ContentItem {
     @SerializedName("original_title")
     private String originalTitle;
 
+    @SerializedName("title")
+    private String title;
+
+    @SerializedName("name")
+    private String name;
+
     @SerializedName("overview")
     private String overview;
 
@@ -73,5 +79,13 @@ public class ContentItem {
 
     public String getReleaseDate() {
         return releaseDate;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -32,4 +32,28 @@ public interface ApiInterface {
             @Query("api_key") String apiKey
     );
 
+    @GET("tv/on_the_air")
+    Call<DataResponse> getTvOnTheAir(
+            @Query("page") int page,
+            @Query("api_key") String apiKey
+    );
+
+    @GET("tv/popular")
+    Call<DataResponse> getTvPopular(
+            @Query("page") int page,
+            @Query("api_key") String apiKey
+    );
+
+    @GET("tv/airing_today")
+    Call<DataResponse> getTvAiringToday(
+            @Query("page") int page,
+            @Query("api_key") String apiKey
+    );
+
+    @GET("tv/top_rated")
+    Call<DataResponse> getTvTopRated(
+            @Query("page") int page,
+            @Query("api_key") String apiKey
+    );
+
 }

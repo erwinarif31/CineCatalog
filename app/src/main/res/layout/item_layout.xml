@@ -13,14 +13,14 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/imageFilmPoster"
+            android:id="@+id/iv_image"
             android:layout_width="160dp"
             android:layout_height="220dp"
             android:scaleType="centerCrop"
             android:src="#74000000" />
 
         <TextView
-            android:id="@+id/textFilmTitle"
+            android:id="@+id/iv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Film Title"
@@ -31,7 +31,7 @@
             android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/textFilmReleaseYear"
+            android:id="@+id/iv_year"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Release Year"

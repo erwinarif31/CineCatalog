@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,11 +14,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.h071211059.h071211059_finalmobile.adapter.ContentAdapter;
-import com.h071211059.h071211059_finalmobile.adapter.MoviePopularAdapter;
+import com.h071211059.h071211059_finalmobile.adapter.ContentPopularAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.FragmentMovieBinding;
 import com.h071211059.h071211059_finalmobile.model.ContentItem;
 import com.h071211059.h071211059_finalmobile.model.DataResponse;
@@ -34,7 +32,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 
 public class MovieFragment extends Fragment {
-    private static FragmentMovieBinding binding;
+    private FragmentMovieBinding binding;
 
     private static MovieFragment instance;
     private static ApiInterface apiInterface;
@@ -42,7 +40,6 @@ public class MovieFragment extends Fragment {
     private static int totalPage;
 
     private static ArrayList<ContentItem> popularMovies;
-    private Retrofit retrofit;
 
     public MovieFragment() {
     }
@@ -65,45 +62,40 @@ public class MovieFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        retrofit = ApiInstance.getInstance();
+        Retrofit retrofit = ApiInstance.getInstance();
         apiInterface = retrofit.create(ApiInterface.class);
 
         Call<DataResponse> clientTopRated = apiInterface.getMovieTopRated(1, ApiInstance.API_KEY);
         Call<DataResponse> clientUpcoming = apiInterface.getMovieUpcoming(1, ApiInstance.API_KEY);
         Call<DataResponse> clientNowPlaying = apiInterface.getMovieNowPlaying(1, ApiInstance.API_KEY);
 
-        getMovies(binding.rvMovieNowPlaying, binding.shimmerNowPlaying, clientNowPlaying);
+        getMovies(binding.rvNowPlaying, binding.shimmerNowPlaying, clientNowPlaying);
         getMovies(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
         getMovies(binding.rvUpcoming, binding.shimmerUpcoming, clientUpcoming);
 
-        binding.rvMoviePopular.setLayoutManager(new GridLayoutManager(instance.getContext(), 3));
+        binding.rvPopular.setLayoutManager(new GridLayoutManager(instance.getContext(), 3));
 
         popularMovies = new ArrayList<>();
-        MoviePopularAdapter adapter = new MoviePopularAdapter(popularMovies);
-        binding.rvMoviePopular.setAdapter(adapter);
+        ContentPopularAdapter adapter = new ContentPopularAdapter(popularMovies);
+        binding.rvPopular.setAdapter(adapter);
 
         getPopularMovies(currentPage);
 
-        binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                getMovies(binding.rvMovieNowPlaying, binding.shimmerNowPlaying, clientNowPlaying);
-                getMovies(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
-                getMovies(binding.rvUpcoming, binding.shimmerUpcoming, clientUpcoming);
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> {
+            getMovies(binding.rvNowPlaying, binding.shimmerNowPlaying, clientNowPlaying);
+            getMovies(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
+            getMovies(binding.rvUpcoming, binding.shimmerUpcoming, clientUpcoming);
 
-                currentPage = 1;
-                getPopularMovies(currentPage);
-            }
+            currentPage = 1;
+            popularMovies.clear();
+            getPopularMovies(currentPage);
         });
 
-        binding.svMovie.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-                if (binding.svMovie.getChildAt(0).getBottom() <= (binding.svMovie.getHeight() + binding.svMovie.getScrollY())) {
-                    if (currentPage < totalPage) {
-                        currentPage++;
-                        getPopularMovies(currentPage);
-                    }
+        binding.svMovie.getViewTreeObserver().addOnScrollChangedListener(() -> {
+            if (binding.svMovie.getChildAt(0).getBottom() <= (binding.svMovie.getHeight() + binding.svMovie.getScrollY())) {
+                if (currentPage < totalPage) {
+                    currentPage++;
+                    getPopularMovies(currentPage);
                 }
             }
         });
@@ -128,7 +120,7 @@ public class MovieFragment extends Fragment {
                         MovieFragment.totalPage = dataResponse.getTotalPages();
 
                         handler.post(() -> {
-                            binding.rvMoviePopular.getAdapter().notifyDataSetChanged();
+                            binding.rvPopular.getAdapter().notifyDataSetChanged();
                             binding.shimmerPopular.stopShimmer();
                             binding.shimmerPopular.setVisibility(View.GONE);
 
@@ -170,8 +162,6 @@ public class MovieFragment extends Fragment {
                             shimmer.stopShimmer();
                             shimmer.setVisibility(View.GONE);
                             rvMovie.setVisibility(View.VISIBLE);
-
-                            binding.swipeRefreshLayout.setRefreshing(false);
                         });
                     }
                 }
