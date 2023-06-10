@@ -29,12 +29,7 @@ public class MainActivity extends AppCompatActivity {
        Fragment fragment = fragmentManager.findFragmentByTag(MovieFragment.class.getSimpleName());
 
        if (!(fragment instanceof MovieFragment)) {
-           binding.ivMovie.setImageResource(R.drawable.ic_movie);
-           fragmentManager
-                   .beginTransaction()
-                   .add(R.id.fl_container, movieFragment,
-                           MovieFragment.class.getSimpleName())
-                   .commit();
+           switchFragment(movieFragment);
        }
 
        binding.llMovie.setOnClickListener(v -> switchFragment(MovieFragment.getInstance()));
@@ -50,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (fragment.getClass().getSimpleName()) {
             case "MovieFragment":
+                MovieFragment.currentPage = 1;
                 binding.ivMovie.setImageResource(R.drawable.ic_movie);
                 break;
             case "TvFragment":
