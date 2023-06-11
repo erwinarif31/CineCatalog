@@ -131,7 +131,11 @@ public class DetailActivity extends AppCompatActivity {
                     if (response.body() != null) {
                         ContentItem contentItem = response.body();
                         handler.post(() -> {
-                            binding.tvTitle.setText(contentItem.getName());
+                            if (contentItem.getTitle() != null) {
+                                binding.tvTitle.setText(contentItem.getTitle());
+                            } else {
+                                binding.tvTitle.setText(contentItem.getName());
+                            }
                             binding.rbRating.setRating(Float.valueOf(contentItem.getVoteAverage()) / 2);
 
                             Glide.with(binding.getRoot()).load(ApiInstance.IMAGE_BASE_URL + contentItem.getPosterPath()).into(binding.ivImage);
