@@ -11,6 +11,8 @@ public class DataHelper {
 
     private static final String CONTENT_TABLE = ContentDBContract.TABLE_NAME;
 
+    private static final String CONTENT_GENRE_TABLE = ContentGenreContract.TABLE_NAME;
+
     private static DBHelper databaseHelper;
 
     private static SQLiteDatabase database;
@@ -79,4 +81,18 @@ public class DataHelper {
         );
     }
 
+    public long insertContentGenre(ContentValues values) {
+        return database.insert(CONTENT_GENRE_TABLE, null, values);
+    }
+
+    public Cursor queryGenreOfContent(String id) {
+        return database.rawQuery("SELECT " +
+                GENRE_TABLE + "." + GenreDBContract.GenreColumns.GENRE_ID + ", " +
+                GENRE_TABLE + "." + GenreDBContract.GenreColumns.NAME +
+                " FROM " + CONTENT_GENRE_TABLE +
+                " JOIN " + GENRE_TABLE + " ON " +
+                CONTENT_GENRE_TABLE + "." + ContentGenreContract.ContentGenreColumns.GENRE_ID + " = " +
+                GENRE_TABLE + "." + GenreDBContract.GenreColumns.GENRE_ID +
+                " WHERE " + CONTENT_GENRE_TABLE + "." + ContentGenreContract.ContentGenreColumns.CONTENT_ID + " = '" + id + "'", null);
+    }
 }

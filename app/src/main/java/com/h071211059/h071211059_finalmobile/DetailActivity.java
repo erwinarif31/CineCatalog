@@ -18,9 +18,11 @@ import com.h071211059.h071211059_finalmobile.adapter.CastAdapter;
 import com.h071211059.h071211059_finalmobile.adapter.GenreAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.ActivityDetailBinding;
 import com.h071211059.h071211059_finalmobile.db.ContentDBContract;
+import com.h071211059.h071211059_finalmobile.db.ContentGenreContract;
 import com.h071211059.h071211059_finalmobile.db.DataHelper;
 import com.h071211059.h071211059_finalmobile.model.CastResponse;
 import com.h071211059.h071211059_finalmobile.model.ContentItem;
+import com.h071211059.h071211059_finalmobile.model.Genre;
 import com.h071211059.h071211059_finalmobile.network.ApiInstance;
 import com.h071211059.h071211059_finalmobile.network.ApiInterface;
 import com.h071211059.h071211059_finalmobile.util.MappingHelper;
@@ -115,6 +117,14 @@ public class DetailActivity extends AppCompatActivity {
 
             long insert = dataHelper.insertContent(values);
 
+            ContentValues genreValues = new ContentValues();
+
+            for (Genre genre : contentItem.getGenres()) {
+                genreValues.put(ContentGenreContract.ContentGenreColumns.CONTENT_ID, contentItem.getId());
+                genreValues.put(ContentGenreContract.ContentGenreColumns.GENRE_ID, genre.getId());
+                long genreInsert = dataHelper.insertContentGenre(genreValues);
+            }
+
             if (insert > 0) {
                 binding.ivFavorite.setImageResource(R.drawable.ic_favorite);
                 isFavorite = true;
@@ -129,8 +139,6 @@ public class DetailActivity extends AppCompatActivity {
                 binding.ivFavorite.setImageResource(R.drawable.ic_favorite_unfilled_2);
                 isFavorite = false;
             }
-
-
         }
     }
 

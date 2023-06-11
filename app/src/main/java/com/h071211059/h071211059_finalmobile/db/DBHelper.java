@@ -47,6 +47,18 @@ public class DBHelper extends SQLiteOpenHelper {
                     ContentDBContract.ContentColumns.BACKDROP_PATH
             );
 
+    private static final String SQL_CREATE_TABLE_CONTENT_GENRE =
+            String.format(
+                    "CREATE TABLE %s"
+                            + " (%s INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            + " %s INTEGER NOT NULL,"
+                            + " %s INTEGER NOT NULL)",
+                    ContentGenreContract.TABLE_NAME,
+                    ContentGenreContract.ContentGenreColumns._ID,
+                    ContentGenreContract.ContentGenreColumns.CONTENT_ID,
+                    ContentGenreContract.ContentGenreColumns.GENRE_ID
+            );
+
     private static final String SQL_DROP_TABLE_GENRE = "DROP TABLE IF EXISTS " + GenreDBContract.TABLE_NAME;
 
     public DBHelper(Context context) {
@@ -57,6 +69,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_GENRE);
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_CONTENT);
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE_CONTENT_GENRE);
     }
 
     @Override
@@ -65,6 +78,9 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
 
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ContentDBContract.TABLE_NAME);
+        onCreate(sqLiteDatabase);
+
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ContentGenreContract.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 

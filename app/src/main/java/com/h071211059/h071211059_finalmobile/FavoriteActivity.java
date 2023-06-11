@@ -1,17 +1,30 @@
 package com.h071211059.h071211059_finalmobile;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.h071211059.h071211059_finalmobile.adapter.GenreAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.ActivityFavoriteBinding;
 import com.h071211059.h071211059_finalmobile.db.ContentDBContract;
 import com.h071211059.h071211059_finalmobile.db.DataHelper;
 import com.h071211059.h071211059_finalmobile.model.ContentItem;
+import com.h071211059.h071211059_finalmobile.model.Genre;
 import com.h071211059.h071211059_finalmobile.network.ApiInstance;
+import com.h071211059.h071211059_finalmobile.util.MappingHelper;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FavoriteActivity extends AppCompatActivity {
 
@@ -34,6 +47,8 @@ public class FavoriteActivity extends AppCompatActivity {
         contentItem = getIntent().getParcelableExtra(EXTRA_CONTENT);
 
         setContent();
+
+        getContentGenres();
 
         binding.clToggle.setOnClickListener(v -> expandOverview());
         binding.ivFavorite.setOnClickListener(v -> addToFavorites());
@@ -110,5 +125,47 @@ public class FavoriteActivity extends AppCompatActivity {
                 isFavorite = false;
             }
         }
+    }
+
+    private void getContentGenres() {
+        new LoadGenreAsync(this, new LoadContentCallback() {
+            @Override
+            public void postExecute(ArrayList<Genre> genres) {
+                binding.rvGenre.setLayoutManager(new LinearLayoutManager(FavoriteActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                GenreAdapter genreAdapter = new GenreAdapter(genres);
+                binding.rvGenre.setAdapter(genreAdapter);
+            }
+        }).execute(contentItem.getId());
+    }
+
+    private static class LoadGenreAsync {
+
+        private final WeakReference<Context> weakContext;
+        private final WeakReference<LoadContentCallback> weakCallback;
+
+        private LoadGenreAsync(Context context, LoadContentCallback callback) {
+            this.weakContext = new WeakReference<>(context);
+            this.weakCallback = new WeakReference<>(callback);
+        }
+
+        void execute(int id) {
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+
+            executorService.execute(() -> {
+                DataHelper dataHelper = new DataHelper(weakContext.get());
+                dataHelper.open();
+
+                Cursor cursor = dataHelper.queryGenreOfContent(String.valueOf(id));
+                ArrayList<Genre> genres = MappingHelper.mapCursorToGenreArrayList(cursor);
+
+                handler.post(() -> weakCallback.get().postExecute(genres));
+            });
+        }
+
+    }
+
+    interface LoadContentCallback {
+        void postExecute(ArrayList<Genre> genres);
     }
 }

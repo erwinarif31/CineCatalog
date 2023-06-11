@@ -3,7 +3,10 @@ package com.h071211059.h071211059_finalmobile.util;
 import android.database.Cursor;
 
 import com.h071211059.h071211059_finalmobile.db.ContentDBContract;
+import com.h071211059.h071211059_finalmobile.db.ContentGenreContract;
+import com.h071211059.h071211059_finalmobile.db.GenreDBContract;
 import com.h071211059.h071211059_finalmobile.model.ContentItem;
+import com.h071211059.h071211059_finalmobile.model.Genre;
 
 import java.util.ArrayList;
 
@@ -43,5 +46,15 @@ public class MappingHelper {
             ));
         }
         return contentList;
+    }
+
+    public static ArrayList<Genre> mapCursorToGenreArrayList(Cursor cursor) {
+        ArrayList<Genre> genreList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(GenreDBContract.GenreColumns.GENRE_ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(GenreDBContract.GenreColumns.NAME));
+            genreList.add(new Genre(id, name));
+        }
+        return genreList;
     }
 }
