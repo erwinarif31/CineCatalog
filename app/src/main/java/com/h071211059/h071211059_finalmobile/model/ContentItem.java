@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 
 public class ContentItem {
+    @SerializedName("id")
+    private int id;
+
     @SerializedName("backdrop_path")
     private String backdropPath;
 
@@ -14,8 +17,8 @@ public class ContentItem {
     @SerializedName("release_date")
     private String releaseDate;
 
-    @SerializedName("genre_ids")
-    private ArrayList<Integer> genreIds;
+    @SerializedName("genres")
+    private ArrayList<Genre> genres;
 
     @SerializedName("original_title")
     private String originalTitle;
@@ -41,6 +44,10 @@ public class ContentItem {
     @SerializedName("vote_count")
     private String voteCount;
 
+    public int getId() {
+        return id;
+    }
+
     public String getBackdropPath() {
         return backdropPath;
     }
@@ -49,8 +56,8 @@ public class ContentItem {
         return firstAirDate;
     }
 
-    public ArrayList<Integer> getGenreIds() {
-        return genreIds;
+    public ArrayList<Genre> getGenres() {
+        return genres;
     }
 
     public String getOriginalTitle() {

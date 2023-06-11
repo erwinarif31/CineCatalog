@@ -1,5 +1,6 @@
 package com.h071211059.h071211059_finalmobile.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.h071211059.h071211059_finalmobile.DetailActivity;
 import com.h071211059.h071211059_finalmobile.adapter.ContentAdapter;
 import com.h071211059.h071211059_finalmobile.adapter.ContentPopularAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.FragmentMovieBinding;
@@ -77,6 +79,7 @@ public class MovieFragment extends Fragment {
 
         popularMovies = new ArrayList<>();
         ContentPopularAdapter adapter = new ContentPopularAdapter(popularMovies);
+        adapter.setOnItemClickListener(contentItem -> detailIntent(contentItem));
         binding.rvPopular.setAdapter(adapter);
 
         getPopularMovies(currentPage);
@@ -158,6 +161,9 @@ public class MovieFragment extends Fragment {
                         handler.post(() -> {
                             rvMovie.setLayoutManager(new LinearLayoutManager(instance.getContext(), LinearLayoutManager.HORIZONTAL, false));
                             ContentAdapter adapter = new ContentAdapter(results);
+                            adapter.setOnItemClickListener((contentItem) -> {
+                                detailIntent(contentItem);
+                            });
                             rvMovie.setAdapter(adapter);
 
                             shimmer.stopShimmer();
@@ -173,5 +179,12 @@ public class MovieFragment extends Fragment {
                 Log.e("Error", t.getMessage());
             }
         }));
+    }
+
+    private static void detailIntent(ContentItem contentItem) {
+        Intent intent = new Intent(instance.getContext(), DetailActivity.class);
+        intent.putExtra("id", contentItem.getId());
+        intent.putExtra("type", "movie");
+        instance.startActivity(intent);
     }
 }

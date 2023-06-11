@@ -1,5 +1,6 @@
 package com.h071211059.h071211059_finalmobile.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.h071211059.h071211059_finalmobile.DetailActivity;
 import com.h071211059.h071211059_finalmobile.adapter.ContentAdapter;
 import com.h071211059.h071211059_finalmobile.adapter.ContentPopularAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.FragmentTvBinding;
@@ -45,7 +47,7 @@ public class TvFragment extends Fragment {
     private static ArrayList<ContentItem> popularTv;
 
     private Retrofit retrofit;
-    private TvFragment() {}
+    public TvFragment() {}
 
     public static TvFragment getInstance() {
         if (instance == null) {
@@ -160,6 +162,9 @@ public class TvFragment extends Fragment {
                         handler.post(() -> {
                             rvTvShow.setLayoutManager(new LinearLayoutManager(instance.getContext(), LinearLayoutManager.HORIZONTAL, false));
                             ContentAdapter adapter = new ContentAdapter(results);
+                            adapter.setOnItemClickListener((contentItem) -> {
+                                detailIntent(contentItem);
+                            });
                             rvTvShow.setAdapter(adapter);
 
                             shimmer.stopShimmer();
@@ -177,5 +182,12 @@ public class TvFragment extends Fragment {
                 Log.e("Error", t.getMessage());
             }
         }));
+    }
+
+    private void detailIntent(ContentItem contentItem) {
+        Intent intent = new Intent(instance.getContext(), DetailActivity.class);
+        intent.putExtra("id", contentItem.getId());
+        intent.putExtra("type", "tv");
+        instance.startActivity(intent);
     }
 }

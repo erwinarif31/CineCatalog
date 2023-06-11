@@ -46,13 +46,17 @@ public class MainActivity extends AppCompatActivity {
         switch (fragment.getClass().getSimpleName()) {
             case "MovieFragment":
                 MovieFragment.currentPage = 1;
+                binding.tvAppbarTitle.setText(R.string.movie);
                 binding.ivMovie.setImageResource(R.drawable.ic_movie);
                 break;
             case "TvFragment":
+                TvFragment.currentPage = 1;
                 binding.ivTvShow.setImageResource(R.drawable.ic_tv);
+                binding.tvAppbarTitle.setText(R.string.tv_show);
                 break;
             case "FavoriteFragment":
                 binding.ivFavorite.setImageResource(R.drawable.ic_favorite);
+                binding.tvAppbarTitle.setText(R.string.favorite);
                 break;
         }
 

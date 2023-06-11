@@ -18,6 +18,12 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentV
 
     ArrayList<ContentItem> contentItems;
 
+    private OnItemClickCallback onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickCallback onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
     public ContentAdapter(ArrayList<ContentItem> contentItems) {
         this.contentItems = contentItems;
     }
@@ -53,6 +59,11 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentV
                 binding.ivTitle.setText(contentItem.getName());
             }
             Glide.with(binding.getRoot()).load(ApiInstance.IMAGE_BASE_URL + contentItem.getPosterPath()).into(binding.ivPoster);
+            binding.getRoot().setOnClickListener(v -> onItemClickListener.onItemClicked(contentItem));
         }
+    }
+
+    public interface OnItemClickCallback {
+        void onItemClicked(ContentItem contentItem);
     }
 }

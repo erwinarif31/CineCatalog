@@ -1,9 +1,12 @@
 package com.h071211059.h071211059_finalmobile.network;
 
+import com.h071211059.h071211059_finalmobile.model.CastResponse;
+import com.h071211059.h071211059_finalmobile.model.ContentItem;
 import com.h071211059.h071211059_finalmobile.model.DataResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiInterface {
@@ -53,6 +56,18 @@ public interface ApiInterface {
     @GET("tv/top_rated")
     Call<DataResponse> getTvTopRated(
             @Query("page") int page,
+            @Query("api_key") String apiKey
+    );
+
+    @GET("movie/{movie_id}")
+    Call<ContentItem> getMovieDetail(
+            @Path("movie_id") int movie_id,
+            @Query("api_key") String apiKey
+    );
+
+    @GET("movie/{movie_id}/credits")
+    Call<CastResponse> getMovieCast(
+            @Path("movie_id") int movie_id,
             @Query("api_key") String apiKey
     );
 
