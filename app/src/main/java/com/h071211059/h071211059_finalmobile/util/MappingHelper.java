@@ -2,9 +2,11 @@ package com.h071211059.h071211059_finalmobile.util;
 
 import android.database.Cursor;
 
+import com.h071211059.h071211059_finalmobile.db.CastDBContract;
 import com.h071211059.h071211059_finalmobile.db.ContentDBContract;
 import com.h071211059.h071211059_finalmobile.db.ContentGenreContract;
 import com.h071211059.h071211059_finalmobile.db.GenreDBContract;
+import com.h071211059.h071211059_finalmobile.model.Cast;
 import com.h071211059.h071211059_finalmobile.model.ContentItem;
 import com.h071211059.h071211059_finalmobile.model.Genre;
 
@@ -56,5 +58,17 @@ public class MappingHelper {
             genreList.add(new Genre(id, name));
         }
         return genreList;
+    }
+
+    public static ArrayList<Cast> mapCursorToArrayCast(Cursor cursor) {
+        ArrayList<Cast> castList = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(CastDBContract.CastColumns.CONTENT_ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(CastDBContract.CastColumns.NAME));
+            String character = cursor.getString(cursor.getColumnIndexOrThrow(CastDBContract.CastColumns.CHARACTER));
+            String profilePath = cursor.getString(cursor.getColumnIndexOrThrow(CastDBContract.CastColumns.PROFILE_PATH));
+            castList.add(new Cast(id, name, character, profilePath));
+        }
+        return castList;
     }
 }

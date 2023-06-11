@@ -17,9 +17,11 @@ import com.bumptech.glide.Glide;
 import com.h071211059.h071211059_finalmobile.adapter.CastAdapter;
 import com.h071211059.h071211059_finalmobile.adapter.GenreAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.ActivityDetailBinding;
+import com.h071211059.h071211059_finalmobile.db.CastDBContract;
 import com.h071211059.h071211059_finalmobile.db.ContentDBContract;
 import com.h071211059.h071211059_finalmobile.db.ContentGenreContract;
 import com.h071211059.h071211059_finalmobile.db.DataHelper;
+import com.h071211059.h071211059_finalmobile.model.Cast;
 import com.h071211059.h071211059_finalmobile.model.CastResponse;
 import com.h071211059.h071211059_finalmobile.model.ContentItem;
 import com.h071211059.h071211059_finalmobile.model.Genre;
@@ -60,6 +62,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private ContentItem contentItem;
 
+    private ArrayList<Cast> casts;
     private int id;
 
     private boolean isFavorite = false;
@@ -122,7 +125,17 @@ public class DetailActivity extends AppCompatActivity {
             for (Genre genre : contentItem.getGenres()) {
                 genreValues.put(ContentGenreContract.ContentGenreColumns.CONTENT_ID, contentItem.getId());
                 genreValues.put(ContentGenreContract.ContentGenreColumns.GENRE_ID, genre.getId());
-                long genreInsert = dataHelper.insertContentGenre(genreValues);
+                dataHelper.insertContentGenre(genreValues);
+            }
+
+            ContentValues castValues = new ContentValues();
+
+            for (Cast cast: casts) {
+                castValues.put(CastDBContract.CastColumns.CONTENT_ID, contentItem.getId());
+                castValues.put(CastDBContract.CastColumns.NAME, cast.getName());
+                castValues.put(CastDBContract.CastColumns.PROFILE_PATH, cast.getProfilePath());
+                castValues.put(CastDBContract.CastColumns.CHARACTER, cast.getCharacter());
+                dataHelper.insertCast(castValues);
             }
 
             if (insert > 0) {
@@ -134,6 +147,8 @@ public class DetailActivity extends AppCompatActivity {
             dataHelper.open();
 
             long delete = dataHelper.deleteContent(String.valueOf(contentItem.getId()));
+            dataHelper.deleteContentGenre(String.valueOf(contentItem.getId()));
+            dataHelper.deleteCast(String.valueOf(contentItem.getId()));
 
             if (delete > 0) {
                 binding.ivFavorite.setImageResource(R.drawable.ic_favorite_unfilled_2);
@@ -166,10 +181,11 @@ public class DetailActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
                         CastResponse castResponse = response.body();
-                        System.out.println(castResponse.getCasts().size());
+                        casts = castResponse.getCasts();
                         handler.post(() -> {
                             binding.rvCast.setLayoutManager(new LinearLayoutManager(DetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
-                            binding.rvCast.setAdapter(new CastAdapter(castResponse.getCasts()));
+                            CastAdapter adapter = new CastAdapter(casts);
+                            binding.rvCast.setAdapter(adapter);
                         });
                     }
                 }

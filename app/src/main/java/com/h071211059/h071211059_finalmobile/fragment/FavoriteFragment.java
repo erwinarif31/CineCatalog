@@ -67,6 +67,9 @@ public class FavoriteFragment extends Fragment {
         new LoadContentAsync(getContext(), contentItems -> {
             if (contentItems.size() > 0) {
                 setRecyclerView(contentItems);
+                binding.rvFavorites.setVisibility(View.VISIBLE);
+            } else {
+                binding.rvFavorites.setVisibility(View.GONE);
             }
         }).execute();
     }

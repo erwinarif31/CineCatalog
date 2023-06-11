@@ -15,6 +15,13 @@ public class Cast {
     @SerializedName("character")
     private String character;
 
+    public Cast(int id, String name, String character, String profilePath) {
+        this.id = id;
+        this.name = name;
+        this.character = character;
+        this.profilePath = profilePath;
+    }
+
     public int getId() {
         return id;
     }

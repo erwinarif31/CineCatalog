@@ -12,10 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.h071211059.h071211059_finalmobile.adapter.CastAdapter;
 import com.h071211059.h071211059_finalmobile.adapter.GenreAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.ActivityFavoriteBinding;
 import com.h071211059.h071211059_finalmobile.db.ContentDBContract;
 import com.h071211059.h071211059_finalmobile.db.DataHelper;
+import com.h071211059.h071211059_finalmobile.model.Cast;
 import com.h071211059.h071211059_finalmobile.model.ContentItem;
 import com.h071211059.h071211059_finalmobile.model.Genre;
 import com.h071211059.h071211059_finalmobile.network.ApiInstance;
@@ -49,6 +51,7 @@ public class FavoriteActivity extends AppCompatActivity {
         setContent();
 
         getContentGenres();
+        getContentCast();
 
         binding.clToggle.setOnClickListener(v -> expandOverview());
         binding.ivFavorite.setOnClickListener(v -> addToFavorites());
@@ -119,16 +122,19 @@ public class FavoriteActivity extends AppCompatActivity {
             dataHelper.open();
 
             long delete = dataHelper.deleteContent(String.valueOf(contentItem.getId()));
+            dataHelper.deleteContentGenre(String.valueOf(contentItem.getId()));
+            dataHelper.deleteCast(String.valueOf(contentItem.getId()));
 
             if (delete > 0) {
                 binding.ivFavorite.setImageResource(R.drawable.ic_favorite_unfilled_2);
                 isFavorite = false;
+                finish();
             }
         }
     }
 
     private void getContentGenres() {
-        new LoadGenreAsync(this, new LoadContentCallback() {
+        new LoadGenreAsync(this, new LoadGenreCallback() {
             @Override
             public void postExecute(ArrayList<Genre> genres) {
                 binding.rvGenre.setLayoutManager(new LinearLayoutManager(FavoriteActivity.this, LinearLayoutManager.HORIZONTAL, false));
@@ -138,12 +144,24 @@ public class FavoriteActivity extends AppCompatActivity {
         }).execute(contentItem.getId());
     }
 
+    private void getContentCast() {
+        new LoadCastAsync(this, new LoadCastCallback() {
+            @Override
+            public void postExecute(ArrayList<Cast> casts) {
+                binding.rvCast.setLayoutManager(new LinearLayoutManager(FavoriteActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                CastAdapter castAdapter = new CastAdapter(casts);
+                binding.rvCast.setAdapter(castAdapter);
+            }
+        }).execute(contentItem.getId());
+    }
+
+
     private static class LoadGenreAsync {
 
         private final WeakReference<Context> weakContext;
-        private final WeakReference<LoadContentCallback> weakCallback;
+        private final WeakReference<LoadGenreCallback> weakCallback;
 
-        private LoadGenreAsync(Context context, LoadContentCallback callback) {
+        private LoadGenreAsync(Context context, LoadGenreCallback callback) {
             this.weakContext = new WeakReference<>(context);
             this.weakCallback = new WeakReference<>(callback);
         }
@@ -162,10 +180,38 @@ public class FavoriteActivity extends AppCompatActivity {
                 handler.post(() -> weakCallback.get().postExecute(genres));
             });
         }
-
     }
 
-    interface LoadContentCallback {
+    private static class LoadCastAsync {
+
+        private final WeakReference<Context> weakContext;
+        private final WeakReference<LoadCastCallback> weakCallback;
+
+        private LoadCastAsync(Context context, LoadCastCallback callback) {
+            this.weakContext = new WeakReference<>(context);
+            this.weakCallback = new WeakReference<>(callback);
+        }
+
+        void execute(int id) {
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+
+            executorService.execute(() -> {
+                DataHelper dataHelper = new DataHelper(weakContext.get());
+                dataHelper.open();
+
+                Cursor cursor = dataHelper.queryCastOf(String.valueOf(id));
+                ArrayList<Cast> casts = MappingHelper.mapCursorToArrayCast(cursor);
+
+                handler.post(() -> weakCallback.get().postExecute(casts));
+            });
+        }
+    }
+    interface LoadGenreCallback {
         void postExecute(ArrayList<Genre> genres);
+    }
+
+    interface LoadCastCallback {
+        void postExecute(ArrayList<Cast> casts);
     }
 }

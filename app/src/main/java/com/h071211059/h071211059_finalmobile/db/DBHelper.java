@@ -59,6 +59,22 @@ public class DBHelper extends SQLiteOpenHelper {
                     ContentGenreContract.ContentGenreColumns.GENRE_ID
             );
 
+    private static final String SQL_CREATE_TABLE_CAST =
+            String.format(
+                    "CREATE TABLE %s"
+                            + " (%s INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            + " %s INTEGER NOT NULL,"
+                            + " %s TEXT NOT NULL,"
+                            + " %s TEXT NOT NULL,"
+                            + " %s TEXT NULL)",
+                    CastDBContract.TABLE_NAME,
+                    CastDBContract.CastColumns._ID,
+                    CastDBContract.CastColumns.CONTENT_ID,
+                    CastDBContract.CastColumns.NAME,
+                    CastDBContract.CastColumns.CHARACTER,
+                    CastDBContract.CastColumns.PROFILE_PATH
+            );
+
     private static final String SQL_DROP_TABLE_GENRE = "DROP TABLE IF EXISTS " + GenreDBContract.TABLE_NAME;
 
     public DBHelper(Context context) {
@@ -70,6 +86,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_GENRE);
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_CONTENT);
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_CONTENT_GENRE);
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE_CAST);
     }
 
     @Override

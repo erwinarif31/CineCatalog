@@ -85,6 +85,10 @@ public class DataHelper {
         return database.insert(CONTENT_GENRE_TABLE, null, values);
     }
 
+    public long deleteContentGenre(String id) {
+        return database.delete(CONTENT_GENRE_TABLE, ContentGenreContract.ContentGenreColumns.CONTENT_ID + " = '" + id + "'", null);
+    }
+
     public Cursor queryGenreOfContent(String id) {
         return database.rawQuery("SELECT " +
                 GENRE_TABLE + "." + GenreDBContract.GenreColumns.GENRE_ID + ", " +
@@ -94,5 +98,25 @@ public class DataHelper {
                 CONTENT_GENRE_TABLE + "." + ContentGenreContract.ContentGenreColumns.GENRE_ID + " = " +
                 GENRE_TABLE + "." + GenreDBContract.GenreColumns.GENRE_ID +
                 " WHERE " + CONTENT_GENRE_TABLE + "." + ContentGenreContract.ContentGenreColumns.CONTENT_ID + " = '" + id + "'", null);
+    }
+
+    public long insertCast(ContentValues values) {
+        return database.insert(CastDBContract.TABLE_NAME, null, values);
+    }
+
+    public long deleteCast(String id) {
+        return database.delete(CastDBContract.TABLE_NAME, CastDBContract.CastColumns.CONTENT_ID + " = '" + id + "'", null);
+    }
+
+    public Cursor queryCastOf(String id) {
+        return database.query(
+                CastDBContract.TABLE_NAME,
+                null,
+                CastDBContract.CastColumns.CONTENT_ID + " = '" + id + "'",
+                null,
+                null,
+                null,
+                null
+        );
     }
 }

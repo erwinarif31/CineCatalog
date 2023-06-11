@@ -51,7 +51,9 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastHolder> {
         public void onBind(Cast cast) {
             binding.tvActor.setText(cast.getName());
             binding.tvCharacter.setText(cast.getCharacter());
-            Glide.with(binding.getRoot()).load(ApiInstance.IMAGE_BASE_URL + cast.getProfilePath()).into(binding.ivProfile);
+            if (cast.getProfilePath() != null) {
+                Glide.with(binding.getRoot()).load(ApiInstance.IMAGE_BASE_URL + cast.getProfilePath()).into(binding.ivProfile);
+            }
         }
     }
 
