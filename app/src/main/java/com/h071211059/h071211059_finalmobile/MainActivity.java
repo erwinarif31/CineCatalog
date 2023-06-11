@@ -1,5 +1,6 @@
 package com.h071211059.h071211059_finalmobile;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 

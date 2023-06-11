@@ -24,6 +24,10 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentV
         this.onItemClickListener = onItemClickListener;
     }
 
+    public void setContentItems(ArrayList<ContentItem> contentItems) {
+        this.contentItems = contentItems;
+    }
+
     public ContentAdapter(ArrayList<ContentItem> contentItems) {
         this.contentItems = contentItems;
     }
