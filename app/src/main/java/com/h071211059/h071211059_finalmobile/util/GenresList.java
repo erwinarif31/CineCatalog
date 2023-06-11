@@ -79,5 +79,7 @@ public class GenresList {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isFirstRun", false);
         editor.apply();
+
+        dataHelper.deleteDuplicateData();
     }
 }

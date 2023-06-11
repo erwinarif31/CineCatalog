@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 
 public class DataHelper {
     private static final String GENRE_TABLE = GenreDBContract.TABLE_NAME;
@@ -118,5 +119,9 @@ public class DataHelper {
                 null,
                 null
         );
+    }
+
+    public void deleteDuplicateData() {
+        database.execSQL("DELETE FROM " + GENRE_TABLE + " WHERE " + GenreDBContract.GenreColumns._ID + " NOT IN (SELECT MIN(" + GenreDBContract.GenreColumns._ID + ") FROM " + GENRE_TABLE + " GROUP BY " + GenreDBContract.GenreColumns.GENRE_ID + ")");
     }
 }
