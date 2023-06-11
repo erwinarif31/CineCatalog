@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         binding.llTvShow.setOnClickListener(v -> switchFragment(TvFragment.getInstance()));
         binding.llFavorite.setOnClickListener(v -> switchFragment(FavoriteFragment.getInstance()));
 
-
         SharedPreferences sharedPreferences = getSharedPreferences("PREFERENCES", MODE_PRIVATE);
 
         boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);

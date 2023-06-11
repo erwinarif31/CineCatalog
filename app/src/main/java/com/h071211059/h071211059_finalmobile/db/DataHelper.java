@@ -67,4 +67,16 @@ public class DataHelper {
         );
     }
 
+    public Cursor queryAllFavoritesContent() {
+        return database.query(
+                CONTENT_TABLE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
 }
