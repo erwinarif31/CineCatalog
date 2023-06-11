@@ -41,7 +41,7 @@ public class MovieFragment extends Fragment {
     public static int currentPage = 1;
     private static int totalPage;
 
-    private static ArrayList<ContentItem> popularMovies;
+    private static ArrayList<ContentItem> popularMovies = new ArrayList<>();
 
     public MovieFragment() {
     }
@@ -70,39 +70,39 @@ public class MovieFragment extends Fragment {
         Call<DataResponse> clientTopRated = apiInterface.getMovieTopRated(1, ApiInstance.API_KEY);
         Call<DataResponse> clientUpcoming = apiInterface.getMovieUpcoming(1, ApiInstance.API_KEY);
         Call<DataResponse> clientNowPlaying = apiInterface.getMovieNowPlaying(1, ApiInstance.API_KEY);
-
         getMovies(binding.rvNowPlaying, binding.shimmerNowPlaying, clientNowPlaying);
         getMovies(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
         getMovies(binding.rvUpcoming, binding.shimmerUpcoming, clientUpcoming);
 
         binding.rvPopular.setLayoutManager(new GridLayoutManager(instance.getContext(), 3));
-
-        popularMovies = new ArrayList<>();
         ContentPopularAdapter adapter = new ContentPopularAdapter(popularMovies);
-        adapter.setOnItemClickListener(contentItem -> detailIntent(contentItem));
+        adapter.setOnItemClickListener(MovieFragment::detailIntent);
         binding.rvPopular.setAdapter(adapter);
-
         getPopularMovies(currentPage);
 
-        binding.swipeRefreshLayout.setOnRefreshListener(() -> {
-            getMovies(binding.rvNowPlaying, binding.shimmerNowPlaying, clientNowPlaying);
-            getMovies(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
-            getMovies(binding.rvUpcoming, binding.shimmerUpcoming, clientUpcoming);
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> refreshContent(clientTopRated, clientUpcoming, clientNowPlaying));
 
-            currentPage = 1;
-            popularMovies.clear();
-            getPopularMovies(currentPage);
-        });
+        binding.svMovie.getViewTreeObserver().addOnScrollChangedListener(this::loadMore);
+    }
 
-        binding.svMovie.getViewTreeObserver().addOnScrollChangedListener(() -> {
-            if (binding.svMovie.getChildAt(0).getBottom() <= (binding.svMovie.getHeight() + binding.svMovie.getScrollY())) {
-                if (currentPage < totalPage) {
-                    System.out.println("Load More");
-                    currentPage++;
-                    getPopularMovies(currentPage);
-                }
+    private void loadMore() {
+        if (binding.svMovie.getChildAt(0).getBottom() <= (binding.svMovie.getHeight() + binding.svMovie.getScrollY())) {
+            if (currentPage < totalPage) {
+                System.out.println("Load More");
+                currentPage++;
+                getPopularMovies(currentPage);
             }
-        });
+        }
+    }
+
+    private void refreshContent(Call<DataResponse> clientTopRated, Call<DataResponse> clientUpcoming, Call<DataResponse> clientNowPlaying) {
+        getMovies(binding.rvNowPlaying, binding.shimmerNowPlaying, clientNowPlaying);
+        getMovies(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
+        getMovies(binding.rvUpcoming, binding.shimmerUpcoming, clientUpcoming);
+
+        currentPage = 1;
+        popularMovies.clear();
+        getPopularMovies(currentPage);
     }
 
     private void getPopularMovies(int currentPage) {
