@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import com.h071211059.h071211059_finalmobile.model.ContentItem;
 import com.h071211059.h071211059_finalmobile.network.ApiInstance;
 import com.h071211059.h071211059_finalmobile.network.ApiInterface;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,6 +27,16 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 
 public class DetailActivity extends AppCompatActivity {
+    public static final String EXTRA_ID = "id";
+
+    public static final String EXTRA_TYPE = "type";
+
+    public static final boolean EXTRA_IS_FAVORITE = false;
+
+    public static final String TV_TYPE = "tv";
+
+    public static final String MOVIE_TYPE = "movie";
+
     private ActivityDetailBinding binding;
 
     private boolean overviewExpanded = false;
@@ -33,43 +45,58 @@ public class DetailActivity extends AppCompatActivity {
 
     private ApiInterface apiInterface;
 
+    private Call<ContentItem> client;
+
+    private Call<CastResponse> castClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        int id = getIntent().getIntExtra("id", 0);
+        int id = getIntent().getIntExtra(EXTRA_ID, 0);
+        String type = getIntent().getStringExtra(EXTRA_TYPE);
 
         retrofit = ApiInstance.getInstance();
         apiInterface = retrofit.create(ApiInterface.class);
 
-        getContentDetails(id);
+        switch (type) {
+            case TV_TYPE:
+                client = apiInterface.getTVDetail(id, ApiInstance.API_KEY);
+                castClient = apiInterface.getTVCasts(id, ApiInstance.API_KEY);
+                break;
+            case MOVIE_TYPE:
+                client = apiInterface.getMovieDetail(id, ApiInstance.API_KEY);
+                castClient = apiInterface.getMovieCast(id, ApiInstance.API_KEY);
+                break;
+        }
 
-        getCasts(id);
+        getContentDetails(client);
+        getCasts(castClient);
 
-        binding.clToggle.setOnClickListener(v -> {
-            if (overviewExpanded) {
-                binding.tvOverview.setMaxLines(2);
-                binding.ivToggle.setImageResource(R.drawable.ic_arrow_down);
-                binding.tvToggle.setText("Show More");
-                overviewExpanded = false;
-            } else {
-                binding.tvOverview.setMaxLines(Integer.MAX_VALUE);
-                binding.ivToggle.setImageResource(R.drawable.ic_arrow_up);
-                binding.tvToggle.setText("Show Less");
-                overviewExpanded = true;
-            }
-        });
+        binding.clToggle.setOnClickListener(v -> expandOverview());
     }
 
-    private void getCasts(int id) {
+    private void expandOverview() {
+        if (overviewExpanded) {
+            binding.tvOverview.setMaxLines(2);
+            binding.ivToggle.setImageResource(R.drawable.ic_arrow_down);
+            binding.tvToggle.setText("Show More");
+            overviewExpanded = false;
+        } else {
+            binding.tvOverview.setMaxLines(Integer.MAX_VALUE);
+            binding.ivToggle.setImageResource(R.drawable.ic_arrow_up);
+            binding.tvToggle.setText("Show Less");
+            overviewExpanded = true;
+        }
+    }
+
+    private void getCasts(Call<CastResponse> castClient) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
-        Call<CastResponse> client = apiInterface.getMovieCast(id, ApiInstance.API_KEY);
 
-
-        executorService.execute(() -> client.enqueue(new retrofit2.Callback<CastResponse>() {
+        executorService.execute(() -> castClient.enqueue(new retrofit2.Callback<CastResponse>() {
             @Override
             public void onResponse(Call<CastResponse> call, retrofit2.Response<CastResponse> response) {
                 if (response.isSuccessful()) {
@@ -91,10 +118,9 @@ public class DetailActivity extends AppCompatActivity {
         }));
     }
 
-    private void getContentDetails(int id) {
+    private void getContentDetails(Call<ContentItem> client) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
-        Call<ContentItem> client = apiInterface.getMovieDetail(id, ApiInstance.API_KEY);
 
         executorService.execute(() -> client.enqueue(new retrofit2.Callback<ContentItem>() {
             @Override
@@ -103,12 +129,21 @@ public class DetailActivity extends AppCompatActivity {
                     if (response.body() != null) {
                         ContentItem contentItem = response.body();
                         handler.post(() -> {
-                            binding.tvTitle.setText(contentItem.getTitle());
+                            binding.tvTitle.setText(contentItem.getName());
+                            binding.rbRating.setRating(Float.valueOf(contentItem.getVoteAverage()) / 2);
+
                             Glide.with(binding.getRoot()).load(ApiInstance.IMAGE_BASE_URL + contentItem.getPosterPath()).into(binding.ivImage);
                             Glide.with(binding.getRoot()).load(ApiInstance.IMAGE_BASE_URL + contentItem.getBackdropPath()).into(binding.ivBanner);
                             binding.ivBanner.setColorFilter(Color.parseColor("#80000000"));
                             binding.rbRating.setRating(Float.valueOf(contentItem.getVoteAverage()) / 2);
-                            binding.tvOverview.setText(contentItem.getOverview());
+
+                            System.out.println("Overview : " + contentItem.getOverview());
+                            if (contentItem.getOverview().equals("")) {
+                                binding.tvOverview.setText("No overview available");
+                                binding.clToggle.setVisibility(View.GONE);
+                            } else {
+                                binding.tvOverview.setText(contentItem.getOverview());
+                            }
 
                             binding.rvGenre.setLayoutManager(new LinearLayoutManager(DetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
                             binding.rvGenre.setAdapter(new GenreAdapter(contentItem.getGenres()));

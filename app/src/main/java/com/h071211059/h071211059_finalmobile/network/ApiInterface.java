@@ -71,4 +71,15 @@ public interface ApiInterface {
             @Query("api_key") String apiKey
     );
 
+    @GET("tv/{series_id}")
+    Call<ContentItem> getTVDetail(
+            @Path("series_id") int series_id,
+            @Query("api_key") String apiKey
+    );
+
+    @GET("tv/{series_id}/credits")
+    Call<CastResponse> getTVCasts(
+            @Path("series_id") int series_id,
+            @Query("api_key") String apiKey
+    );
 }

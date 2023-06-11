@@ -73,37 +73,45 @@ public class TvFragment extends Fragment {
         Call<DataResponse> clientAiringToday = apiInterface.getTvAiringToday(1, ApiInstance.API_KEY);
         Call<DataResponse> clientTopRated = apiInterface.getTvTopRated(1, ApiInstance.API_KEY);
         Call<DataResponse> clientOnTheAir = apiInterface.getTvOnTheAir(1, ApiInstance.API_KEY);
-
         getTvShow(binding.rvNowPlaying, binding.shimmerNowPlaying, clientOnTheAir);
         getTvShow(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
         getTvShow(binding.rvUpcoming, binding.shimmerUpcoming, clientAiringToday);
 
-        binding.rvPopular.setLayoutManager(new GridLayoutManager(instance.getContext(), 3));
+        getPopular();
 
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> refreshContent(clientAiringToday, clientTopRated, clientOnTheAir));
+
+        binding.svMovie.getViewTreeObserver().addOnScrollChangedListener(this::loadMore);
+
+    }
+
+    private void getPopular() {
+        binding.rvPopular.setLayoutManager(new GridLayoutManager(instance.getContext(), 3));
         popularTv = new ArrayList<>();
         ContentPopularAdapter adapter = new ContentPopularAdapter(popularTv);
+        adapter.setOnItemClickListener(this::detailIntent);
         binding.rvPopular.setAdapter(adapter);
 
         getPopularTvShow(currentPage);
+    }
 
-        binding.swipeRefreshLayout.setOnRefreshListener(() -> {
-            getTvShow(binding.rvNowPlaying, binding.shimmerNowPlaying, clientOnTheAir);
-            getTvShow(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
-            getTvShow(binding.rvUpcoming, binding.shimmerUpcoming, clientAiringToday);
-
-            currentPage = 1;
-            popularTv.clear();
-            getPopularTvShow(currentPage);
-        });
-
-        binding.svMovie.getViewTreeObserver().addOnScrollChangedListener(() -> {
-            if (binding.svMovie.getChildAt(0).getBottom() <= (binding.svMovie.getHeight() + binding.svMovie.getScrollY())) {
-                if (currentPage < totalPage) {
-                    currentPage++;
-                    getPopularTvShow(currentPage);
-                }
+    private void loadMore() {
+        if (binding.svMovie.getChildAt(0).getBottom() <= (binding.svMovie.getHeight() + binding.svMovie.getScrollY())) {
+            if (currentPage < totalPage) {
+                currentPage++;
+                getPopularTvShow(currentPage);
             }
-        });
+        }
+    }
+
+    private void refreshContent(Call<DataResponse> clientAiringToday, Call<DataResponse> clientTopRated, Call<DataResponse> clientOnTheAir) {
+        getTvShow(binding.rvNowPlaying, binding.shimmerNowPlaying, clientOnTheAir);
+        getTvShow(binding.rvTopRated, binding.shimmerTopRated, clientTopRated);
+        getTvShow(binding.rvUpcoming, binding.shimmerUpcoming, clientAiringToday);
+
+        currentPage = 1;
+        popularTv.clear();
+        getPopularTvShow(currentPage);
     }
 
     private void getPopularTvShow(int currentPage) {
@@ -186,8 +194,8 @@ public class TvFragment extends Fragment {
 
     private void detailIntent(ContentItem contentItem) {
         Intent intent = new Intent(instance.getContext(), DetailActivity.class);
-        intent.putExtra("id", contentItem.getId());
-        intent.putExtra("type", "tv");
+        intent.putExtra(DetailActivity.EXTRA_ID, contentItem.getId());
+        intent.putExtra(DetailActivity.EXTRA_TYPE, DetailActivity.TV_TYPE);
         instance.startActivity(intent);
     }
 }
