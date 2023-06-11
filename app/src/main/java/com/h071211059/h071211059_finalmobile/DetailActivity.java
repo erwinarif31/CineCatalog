@@ -65,6 +65,7 @@ public class DetailActivity extends AppCompatActivity {
             case TV_TYPE:
                 client = apiInterface.getTVDetail(id, ApiInstance.API_KEY);
                 castClient = apiInterface.getTVCasts(id, ApiInstance.API_KEY);
+                binding.ivType.setImageResource(R.drawable.ic_twotone_tv);
                 break;
             case MOVIE_TYPE:
                 client = apiInterface.getMovieDetail(id, ApiInstance.API_KEY);
@@ -76,6 +77,7 @@ public class DetailActivity extends AppCompatActivity {
         getCasts(castClient);
 
         binding.clToggle.setOnClickListener(v -> expandOverview());
+        binding.ivBack.setOnClickListener(v -> onBackPressed());
     }
 
     private void expandOverview() {
