@@ -12,12 +12,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.h071211059.h071211059_finalmobile.DetailActivity;
+import com.h071211059.h071211059_finalmobile.R;
 import com.h071211059.h071211059_finalmobile.adapter.ContentAdapter;
 import com.h071211059.h071211059_finalmobile.adapter.ContentPopularAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.FragmentMovieBinding;

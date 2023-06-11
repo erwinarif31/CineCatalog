@@ -14,6 +14,7 @@ import com.h071211059.h071211059_finalmobile.fragment.FavoriteFragment;
 import com.h071211059.h071211059_finalmobile.fragment.MovieFragment;
 import com.h071211059.h071211059_finalmobile.fragment.TvFragment;
 import com.h071211059.h071211059_finalmobile.util.GenresList;
+import com.h071211059.h071211059_finalmobile.util.NetworkUtil;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -30,7 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
         Fragment fragment = fragmentManager.findFragmentByTag(MovieFragment.class.getSimpleName());
 
-        if (!(fragment instanceof MovieFragment)) {
+        if (!NetworkUtil.isConnected(getApplicationContext())) {
+            switchFragment(FavoriteFragment.getInstance());
+        } else if (!(fragment instanceof MovieFragment)) {
             switchFragment(movieFragment);
         }
 
