@@ -21,6 +21,32 @@ public class DBHelper extends SQLiteOpenHelper {
                     GenreDBContract.GenreColumns.NAME
             );
 
+    private  static final String SQL_CREATE_TABLE_CONTENT =
+            String.format(
+                    "CREATE TABLE %s"
+                            + " (%s INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            + " %s INTEGER NOT NULL,"
+                            + " %s TEXT NULL,"
+                            + " %s TEXT NULL,"
+                            + " %s TEXT NULL,"
+                            + " %s TEXT NULL,"
+                            + " %s TEXT NULL,"
+                            + " %s TEXT NOT NULL,"
+                            + " %s TEXT NOT NULL,"
+                            + " %s TEXT NOT NULL)",
+                    ContentDBContract.TABLE_NAME,
+                    ContentDBContract.ContentColumns._ID,
+                    ContentDBContract.ContentColumns.CONTENT_ID,
+                    ContentDBContract.ContentColumns.FIRST_AIR_DATE,
+                    ContentDBContract.ContentColumns.RELEASE_DATE,
+                    ContentDBContract.ContentColumns.NAME,
+                    ContentDBContract.ContentColumns.TITLE,
+                    ContentDBContract.ContentColumns.OVERVIEW,
+                    ContentDBContract.ContentColumns.POSTER_PATH,
+                    ContentDBContract.ContentColumns.VOTE_AVERAGE,
+                    ContentDBContract.ContentColumns.BACKDROP_PATH
+            );
+
     private static final String SQL_DROP_TABLE_GENRE = "DROP TABLE IF EXISTS " + GenreDBContract.TABLE_NAME;
 
     public DBHelper(Context context) {
@@ -30,11 +56,15 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE_GENRE);
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE_CONTENT);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + GenreDBContract.TABLE_NAME);
+        onCreate(sqLiteDatabase);
+
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ContentDBContract.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 

@@ -5,14 +5,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.h071211059.h071211059_finalmobile.db.GenreDBContract;
-import com.h071211059.h071211059_finalmobile.db.GenreHelper;
+import com.h071211059.h071211059_finalmobile.db.DataHelper;
 import com.h071211059.h071211059_finalmobile.model.Genre;
 import com.h071211059.h071211059_finalmobile.model.GenreResponse;
 import com.h071211059.h071211059_finalmobile.network.ApiInstance;
 import com.h071211059.h071211059_finalmobile.network.ApiInterface;
 
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -65,15 +64,15 @@ public class GenresList {
     }
 
     private static void insertToDB(ArrayList<Genre> genres, Context applicationContext) {
-        GenreHelper genreHelper = GenreHelper.getInstance(applicationContext);
-        genreHelper.open();
+        DataHelper dataHelper = DataHelper.getInstance(applicationContext);
+        dataHelper.open();
 
         for (Genre genre : genres) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(GenreDBContract.GenreColumns.GENRE_ID, genre.getId());
             contentValues.put(GenreDBContract.GenreColumns.NAME, genre.getName());
 
-            genreHelper.insert(contentValues);
+            dataHelper.insertGenre(contentValues);
         }
 
         SharedPreferences sharedPreferences = applicationContext.getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE);

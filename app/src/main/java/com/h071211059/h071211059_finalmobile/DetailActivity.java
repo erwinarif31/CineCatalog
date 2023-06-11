@@ -1,5 +1,8 @@
 package com.h071211059.h071211059_finalmobile;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,12 +17,16 @@ import com.bumptech.glide.Glide;
 import com.h071211059.h071211059_finalmobile.adapter.CastAdapter;
 import com.h071211059.h071211059_finalmobile.adapter.GenreAdapter;
 import com.h071211059.h071211059_finalmobile.databinding.ActivityDetailBinding;
+import com.h071211059.h071211059_finalmobile.db.ContentDBContract;
+import com.h071211059.h071211059_finalmobile.db.DataHelper;
 import com.h071211059.h071211059_finalmobile.model.CastResponse;
 import com.h071211059.h071211059_finalmobile.model.ContentItem;
 import com.h071211059.h071211059_finalmobile.network.ApiInstance;
 import com.h071211059.h071211059_finalmobile.network.ApiInterface;
+import com.h071211059.h071211059_finalmobile.util.MappingHelper;
 
-import java.util.Objects;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,13 +56,19 @@ public class DetailActivity extends AppCompatActivity {
 
     private Call<CastResponse> castClient;
 
+    private ContentItem contentItem;
+
+    private int id;
+
+    private boolean isFavorite = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        int id = getIntent().getIntExtra(EXTRA_ID, 0);
+        id = getIntent().getIntExtra(EXTRA_ID, 0);
         String type = getIntent().getStringExtra(EXTRA_TYPE);
 
         retrofit = ApiInstance.getInstance();
@@ -76,8 +89,49 @@ public class DetailActivity extends AppCompatActivity {
         getContentDetails(client);
         getCasts(castClient);
 
+        checkFavorites();
+
         binding.clToggle.setOnClickListener(v -> expandOverview());
         binding.ivBack.setOnClickListener(v -> onBackPressed());
+        binding.ivFavorite.setOnClickListener(v -> addToFavorites());
+    }
+
+
+    private void addToFavorites() {
+        if (!isFavorite) {
+            DataHelper dataHelper = new DataHelper(DetailActivity.this);
+            dataHelper.open();
+
+            ContentValues values = new ContentValues();
+            values.put(ContentDBContract.ContentColumns.CONTENT_ID, contentItem.getId());
+            values.put(ContentDBContract.ContentColumns.BACKDROP_PATH, contentItem.getBackdropPath());
+            values.put(ContentDBContract.ContentColumns.FIRST_AIR_DATE, contentItem.getFirstAirDate());
+            values.put(ContentDBContract.ContentColumns.RELEASE_DATE, contentItem.getReleaseDate());
+            values.put(ContentDBContract.ContentColumns.NAME, contentItem.getName());
+            values.put(ContentDBContract.ContentColumns.TITLE, contentItem.getTitle());
+            values.put(ContentDBContract.ContentColumns.OVERVIEW, contentItem.getOverview());
+            values.put(ContentDBContract.ContentColumns.POSTER_PATH, contentItem.getPosterPath());
+            values.put(ContentDBContract.ContentColumns.VOTE_AVERAGE, contentItem.getVoteAverage());
+
+            long insert = dataHelper.insertContent(values);
+
+            if (insert > 0) {
+                binding.ivFavorite.setImageResource(R.drawable.ic_favorite);
+                isFavorite = true;
+            }
+        } else {
+            DataHelper dataHelper = new DataHelper(DetailActivity.this);
+            dataHelper.open();
+
+            long delete = dataHelper.deleteContent(String.valueOf(contentItem.getId()));
+
+            if (delete > 0) {
+                binding.ivFavorite.setImageResource(R.drawable.ic_favorite_unfilled_2);
+                isFavorite = false;
+            }
+
+
+        }
     }
 
     private void expandOverview() {
@@ -129,7 +183,7 @@ public class DetailActivity extends AppCompatActivity {
             public void onResponse(Call<ContentItem> call, retrofit2.Response<ContentItem> response) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        ContentItem contentItem = response.body();
+                        contentItem = response.body();
                         handler.post(() -> {
                             if (contentItem.getTitle() != null) {
                                 binding.tvTitle.setText(contentItem.getTitle());
@@ -164,4 +218,46 @@ public class DetailActivity extends AppCompatActivity {
             }
         }));
     }
+
+    private void checkFavorites() {
+        new LoadContentAsync(this, ids -> {
+            if (ids.contains(id)) {
+                binding.ivFavorite.setImageResource(R.drawable.ic_favorite);
+                isFavorite = true;
+            } else {
+                binding.ivFavorite.setImageResource(R.drawable.ic_favorite_unfilled_2);
+                isFavorite = false;
+            }
+        }).getFavoritesId();
+    }
+
+    private static class LoadContentAsync {
+
+        private final WeakReference<Context> weakContext;
+        private final WeakReference<LoadContentCallback> weakCallback;
+
+        private LoadContentAsync(Context context, LoadContentCallback callback) {
+            this.weakContext = new WeakReference<>(context);
+            this.weakCallback = new WeakReference<>(callback);
+        }
+
+        void getFavoritesId() {
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+
+            executorService.execute(() -> {
+                DataHelper dataHelper = new DataHelper(weakContext.get());
+                dataHelper.open();
+                Cursor cursor = dataHelper.queryAllFavoritesId();
+                ArrayList<Integer> ids = MappingHelper.mapCursorToArrayIds(cursor);
+                handler.post(() -> weakCallback.get().postExecuteId(ids));
+            });
+        }
+
+    }
+
+    interface LoadContentCallback {
+        void postExecuteId(ArrayList<Integer> ids);
+    }
+
 }

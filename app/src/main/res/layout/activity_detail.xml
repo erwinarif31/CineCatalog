@@ -103,11 +103,13 @@
             android:src="@drawable/ic_arrow_back"
             android:layout_margin="8dp"
             android:foreground="@drawable/ripple_effect"
+            android:tag="unfavorite"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
         <ImageView
+            android:id="@+id/iv_favorite"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/ic_favorite_unfilled_2"

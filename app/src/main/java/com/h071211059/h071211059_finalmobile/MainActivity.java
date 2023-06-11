@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.h071211059.h071211059_finalmobile.databinding.ActivityMainBinding;
-import com.h071211059.h071211059_finalmobile.db.GenreHelper;
+import com.h071211059.h071211059_finalmobile.db.DataHelper;
 import com.h071211059.h071211059_finalmobile.fragment.FavoriteFragment;
 import com.h071211059.h071211059_finalmobile.fragment.MovieFragment;
 import com.h071211059.h071211059_finalmobile.fragment.TvFragment;
@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstRun) {
             GenresList.getGenres(getApplicationContext());
         } else {
-            GenreHelper genreHelper = GenreHelper.getInstance(getApplicationContext());
-            genreHelper.open();
+            DataHelper dataHelper = DataHelper.getInstance(getApplicationContext());
+            dataHelper.open();
         }
 
 
