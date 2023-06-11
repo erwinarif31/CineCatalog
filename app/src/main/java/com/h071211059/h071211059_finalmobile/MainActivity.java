@@ -1,17 +1,19 @@
 package com.h071211059.h071211059_finalmobile;
 
+import android.content.SharedPreferences;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.app.Activity;
-import android.os.Bundle;
-
 import com.h071211059.h071211059_finalmobile.databinding.ActivityMainBinding;
+import com.h071211059.h071211059_finalmobile.db.GenreHelper;
 import com.h071211059.h071211059_finalmobile.fragment.FavoriteFragment;
 import com.h071211059.h071211059_finalmobile.fragment.MovieFragment;
 import com.h071211059.h071211059_finalmobile.fragment.TvFragment;
+import com.h071211059.h071211059_finalmobile.util.GenresList;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -23,18 +25,33 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-       fragmentManager = getSupportFragmentManager();
-       MovieFragment movieFragment = MovieFragment.getInstance();
+        fragmentManager = getSupportFragmentManager();
+        MovieFragment movieFragment = MovieFragment.getInstance();
 
-       Fragment fragment = fragmentManager.findFragmentByTag(MovieFragment.class.getSimpleName());
+        Fragment fragment = fragmentManager.findFragmentByTag(MovieFragment.class.getSimpleName());
 
-       if (!(fragment instanceof MovieFragment)) {
-           switchFragment(movieFragment);
-       }
+        if (!(fragment instanceof MovieFragment)) {
+            switchFragment(movieFragment);
+        }
 
-       binding.llMovie.setOnClickListener(v -> switchFragment(MovieFragment.getInstance()));
-       binding.llTvShow.setOnClickListener(v -> switchFragment(TvFragment.getInstance()));
-       binding.llFavorite.setOnClickListener(v -> switchFragment(FavoriteFragment.getInstance()));
+        binding.llMovie.setOnClickListener(v -> switchFragment(MovieFragment.getInstance()));
+        binding.llTvShow.setOnClickListener(v -> switchFragment(TvFragment.getInstance()));
+        binding.llFavorite.setOnClickListener(v -> switchFragment(FavoriteFragment.getInstance()));
+
+
+        SharedPreferences sharedPreferences = getSharedPreferences("PREFERENCES", MODE_PRIVATE);
+
+        boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
+        System.out.println("isFirstRun: " + isFirstRun);
+
+        if (isFirstRun) {
+            GenresList.getGenres(getApplicationContext());
+        } else {
+            GenreHelper genreHelper = GenreHelper.getInstance(getApplicationContext());
+            genreHelper.open();
+        }
+
+
     }
 
     private void switchFragment(Fragment fragment) {
